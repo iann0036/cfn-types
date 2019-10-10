@@ -1,0 +1,14 @@
+{
+    "typeName": "MyCorp::EC2::KeyPair",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "com.mycorp.ec2.keypair.HandlerWrapper::handleRequest",
+    "settings": {
+        "namespace": [
+            "com",
+            "mycorp",
+            "ec2",
+            "keypair"
+        ]
+    }
+}

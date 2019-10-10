@@ -1,0 +1,65 @@
+{
+    "typeName": "MyCorp::EC2::KeyPair",
+    "description": "Provides an EC2 key pair resource. A key pair is used to control login access to EC2 instances. This resource requires an existing user-supplied key pair.",
+    "sourceUrl": "https://github.com/iann0036/cfn-types/blob/master/mycorp-ec2-keypair/README.md",
+    "properties": {
+        "KeyName": {
+            "description": "The name for the key pair.",
+            "type": "string"
+        },
+        "PublicKey": {
+            "description": "The public key material.",
+            "type": "string"
+        },
+        "Fingerprint": {
+            "description": "The MD5 public key fingerprint as specified in section 4 of RFC 4716.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "KeyName",
+        "PublicKey"
+    ],
+    "additionalIdentifiers": [
+        [
+            "/properties/Fingerprint"
+        ]
+    ],
+    "readOnlyProperties": [
+        "/properties/Fingerprint"
+    ],
+    "writeOnlyProperties": [
+        "/properties/PublicKey"
+    ],
+    "primaryIdentifier": [
+        "/properties/KeyName"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ec2:ImportKeyPair"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "ec2:DescribeKeyPairs"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ec2:DeleteKeyPair",
+                "ec2:ImportKeyPair"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "ec2:DeleteKeyPair"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "ec2:DescribeKeyPairs"
+            ]
+        }
+    }
+}

@@ -1,0 +1,6 @@
+Resources:
+    MyKey:
+        Type: MyCorp::EC2::KeyPair
+        Properties:
+            KeyName: MyCorpKeyPairExample
+            PublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDU9sjjIO7wdRJT495agnFi++KlKjHKEBpCnHYHJB4U9+1tZPvSkrRI0nD8LULYIgFVi+VbBxlzLol376kAYK1iCE68B5p1DGRV1ecoJgmJSiBGjEz5BDS1ineLToJtLh2Ccb2xQF1Pe8dcyP8Ogu+/AAG5QMyPK+taXcU20ZlprQ7z8UlRsOdTHiYWFJH8NXkGCihLTBaYNDEz6wmgHTsN5HWkaNz32mH/AEJJfiN7rAmKmbk5DKtJccjP9Wp4mnvXWg22EFowIafksLbxc+P+xQgZN+9Coz+HSo/ePFHiLB7YZoEusMBgAY/UttJbNPoEhSitNuDkcHAUAz9ElWMl

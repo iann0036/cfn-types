@@ -1,0 +1,14 @@
+{
+    "typeName": "PagerDuty::Resources::Service",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "com.pagerduty.resources.service.HandlerWrapper::handleRequest",
+    "settings": {
+        "namespace": [
+            "com",
+            "pagerduty",
+            "resources",
+            "service"
+        ]
+    }
+}

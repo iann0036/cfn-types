@@ -1,0 +1,14 @@
+{
+    "typeName": "IanMckay::S3::Object",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "com.ianmckay.s3.object.HandlerWrapper::handleRequest",
+    "settings": {
+        "namespace": [
+            "com",
+            "ianmckay",
+            "s3",
+            "object"
+        ]
+    }
+}

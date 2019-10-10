@@ -1,0 +1,124 @@
+{
+    "typeName": "IanMckay::S3::Object",
+    "description": "Creates objects within existing S3 buckets.",
+    "sourceUrl": "https://github.com/iann0036/cfn-types/blob/master/ianmckay-s3-object/README.md",
+    "definitions": {
+        "Target": {
+            "type": "object",
+            "properties": {
+                "Bucket": {
+                    "description": "The name of the bucket in which holds the object.",
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-.]{1,61}[A-Za-z0-9]$",
+                    "minLength": 3,
+                    "maxLength": 63
+                },
+                "Key": {
+                    "description": "The location of the object within the bucket.",
+                    "type": "string"
+                },
+                "ACL": {
+                    "description": "The location of the object within the bucket.",
+                    "type": "string",
+                    "enum": [
+                        "private",
+                        "public-read",
+                        "public-read-write",
+                        "aws-exec-read",
+                        "authenticated-read",
+                        "bucket-owner-read",
+                        "bucket-owner-full-control"
+                    ]
+                }
+            },
+            "required": [
+                "Bucket",
+                "Key"
+            ]
+        }
+    },
+    "properties": {
+        "Target": {
+            "description": "The location of the object.",
+            "type": "object",
+            "$ref": "#/definitions/Target"
+        },
+        "Body": {
+            "description": "The content of the object.",
+            "type": "string"
+        },
+        "ETag": {
+            "description": "The ETag returned from the object upload.",
+            "type": "string"
+        },
+        "S3Url": {
+            "description": "The path of the object, starting with s3://.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "Target"
+    ],
+    "readOnlyProperties": [
+        "/properties/ETag",
+        "/properties/S3Url"
+    ],
+    "primaryIdentifier": [
+        "/properties/S3Url"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionAcl",
+                "s3:PutObjectVersionTagging"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:GetObjectTagging",
+                "s3:GetObjectVersion",
+                "s3:GetObjectVersionAcl",
+                "s3:GetObjectVersionTagging"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionAcl",
+                "s3:PutObjectVersionTagging",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:GetObjectTagging",
+                "s3:GetObjectVersion",
+                "s3:GetObjectVersionAcl",
+                "s3:GetObjectVersionTagging"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "s3:DeleteObject",
+                "s3:DeleteObjectVersion"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "s3:ListBucket",
+                "s3:ListBucketVersions",
+                "s3:ListAllMyBuckets",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:GetObjectTagging",
+                "s3:GetObjectVersion",
+                "s3:GetObjectVersionAcl",
+                "s3:GetObjectVersionTagging"
+            ]
+        }
+    }
+}

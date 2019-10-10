@@ -1,0 +1,33 @@
+{
+    "typeName": "PagerDuty::Resources::Service",
+    "description": "Creates a service in a PagerDuty account. A service represents something you monitor (like a web service, email service, or database service). It is a container for related incidents that associates them with escalation policies.",
+    "sourceUrl": "https://github.com/iann0036/cfn-types/blob/master/pagerduty-resources-service/README.md",
+    "properties": {
+        "AuthorizationToken": {
+            "type": "string"
+        },
+        "Name": {
+            "type": "string"
+        },
+        "EscalationPolicy": {
+            "type": "string"
+        },
+        "Id": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "/properties/AuthorizationToken"
+    ],
+    "writeOnlyProperties": [
+        "/properties/AuthorizationToken"
+    ],
+    "readOnlyProperties": [
+        "/properties/Id"
+    ],
+    "primaryIdentifier": [
+        "/properties/Id"
+    ],
+    "handlers": {
+    }
+}

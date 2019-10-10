@@ -1,0 +1,9 @@
+Resources:
+    obj:
+        Type: IanMckay::S3::Object
+        Properties:
+            Body: content
+            Target:
+                Bucket: mybucket
+                Key: afile.txt
+                ACL: private

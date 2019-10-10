@@ -1,0 +1,6 @@
+Resources:
+    Service:
+        Type: PagerDuty::Resources::Service
+        Properties:
+            AuthorizationToken: XXXXX
+            Name: iantest
