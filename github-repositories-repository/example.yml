@@ -1,0 +1,17 @@
+Resources:
+    AnObj:
+        Type: GitHub::Repositories::Repository
+        Properties:
+            Username: username
+            Password: githubpasswordorpersonalaccesstoken
+            Name: my-test-repo
+            Description: A description of the repo
+            IsPrivate: true
+            Homepage: https://example.com
+            HasWiki: false
+            HasIssues: true
+            #Owner: mycorp
+
+Outputs:
+    RepoPath:
+        Value: !GetAtt AnObj.RepoPath

@@ -1,0 +1,84 @@
+{
+    "typeName": "GitHub::Repositories::Repository",
+    "description": "Creates a GitHub repo.",
+    "sourceUrl": "https://github.com/iann0036/cfn-types/blob/master/github-repositories-repository/README.md",
+    "properties": {
+        "Username": {
+            "type": "string"
+        },
+        "Password": {
+            "type": "string"
+        },
+        "Description": {
+            "type": "string"
+        },
+        "Name": {
+            "type": "string"
+        },
+        "IsPrivate": {
+            "type": "boolean"
+        },
+        "RepoPath": {
+            "type": "string"
+        },
+        "Owner": {
+            "type": "string"
+        },
+        "Homepage": {
+            "type": "string"
+        },
+        "HasIssues": {
+            "type": "boolean"
+        },
+        "HasWiki": {
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "Username",
+        "Password",
+        "Name"
+    ],
+    "writeOnlyProperties": [
+        "/properties/Username",
+        "/properties/Password"
+    ],
+    "readOnlyProperties": [
+        "/properties/RepoPath"
+    ],
+    "primaryIdentifier": [
+        "/properties/RepoPath"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "sts:AssumeRole",
+                "*"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "sts:AssumeRole",
+                "*"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "sts:AssumeRole",
+                "*"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "sts:AssumeRole",
+                "*"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "sts:AssumeRole",
+                "*"
+            ]
+        }
+    }
+}

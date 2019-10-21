@@ -1,0 +1,15 @@
+{
+    "typeName": "GitHub::Repositories::Repository",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "com.github.repositories.repository.HandlerWrapper::handleRequest",
+    "testEntrypoint": "com.github.repositories.repository.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "com",
+            "github",
+            "repositories",
+            "repository"
+        ]
+    }
+}
