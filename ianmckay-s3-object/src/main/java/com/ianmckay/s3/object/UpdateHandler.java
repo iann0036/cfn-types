@@ -113,7 +113,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
 
             PutObjectResult putObjectResult = client.putObject(putObjectRequest);
 
-            if (previousBucketName != bucketName || previousKeyName != keyName) {
+            if (!previousBucketName.equals(bucketName) || !previousKeyName.equals(keyName)) {
                 DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(previousBucketName, previousKeyName);
 
                 client.deleteObject(deleteObjectRequest);
