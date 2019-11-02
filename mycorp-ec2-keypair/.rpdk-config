@@ -3,6 +3,7 @@
     "language": "java",
     "runtime": "java8",
     "entrypoint": "com.mycorp.ec2.keypair.HandlerWrapper::handleRequest",
+    "testEntrypoint": "com.mycorp.ec2.keypair.HandlerWrapper::testEntrypoint",
     "settings": {
         "namespace": [
             "com",
