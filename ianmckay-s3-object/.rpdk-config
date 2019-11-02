@@ -3,6 +3,7 @@
     "language": "java",
     "runtime": "java8",
     "entrypoint": "com.ianmckay.s3.object.HandlerWrapper::handleRequest",
+    "testEntrypoint": "com.ianmckay.s3.object.HandlerWrapper::testEntrypoint",
     "settings": {
         "namespace": [
             "com",
