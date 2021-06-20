@@ -2,6 +2,12 @@
 
 Below are some example CloudFormation Resource Type examples.
 
+### (Post Launch)
+
+- [*Transcribe Custom Vocabulary*](https://github.com/iann0036/cfn-types/blob/master/generic-transcribe-vocabulary/README.md) - Creates a Transcribe Custom Vocabulary
+
+### (Original Launch)
+
 - [*Imported Key Pair*](https://github.com/iann0036/cfn-types/blob/master/mycorp-ec2-keypair/README.md) - Imports an EC2 key pair with existing key material (used in the walkthrough blog)
 - [*S3 Object*](https://github.com/iann0036/cfn-types/blob/master/ianmckay-s3-object/README.md) - Creates and manages an S3 object from user-defined content
 - [*GitHub Repo*](https://github.com/iann0036/cfn-types/blob/master/github-repositories-repository/README.md) - Creates a personal or organizational GitHub repo

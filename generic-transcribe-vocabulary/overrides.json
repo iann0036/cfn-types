@@ -1,0 +1,14 @@
+{
+    "CREATE": {
+        "/LanguageCode": "en-US",
+        "/Phrases": [
+            "abc"
+        ]
+    },
+    "UPDATE": {
+        "/LanguageCode": "en-US",
+        "/Phrases": [
+            "def"
+        ]
+    }
+}
