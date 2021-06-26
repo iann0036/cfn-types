@@ -62,15 +62,15 @@
         },
         "FilledQuantity": {
             "description": "The total quantity filled.",
-            "type": "number"
+            "type": "string"
         },
         "FilledValue": {
             "description": "The total notional value the order filled at.",
-            "type": "number"
+            "type": "string"
         },
         "CurrentValue": {
             "description": "The latest trade price (quote) for the filled quantity.",
-            "type": "number"
+            "type": "string"
         },
         "FilledAt": {
             "description": "The timestamp when the order was filled.",

@@ -15,14 +15,16 @@
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "insertionOrder": true
                 },
                 "SQL": {
                     "description": "An array of SQL statements to execute within the database.",
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "insertionOrder": true
                 }
             },
             "required": [
@@ -50,7 +52,8 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/Grant"
-                    }
+                    },
+                    "insertionOrder": true
                 }
             },
             "required": [
@@ -69,8 +72,10 @@
                     "description": "An array of privileges to grant (CONNECT, SELECT, etc.).",
                     "type": "array",
                     "items": {
-                        "type": "string"
-                    }
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9]+$"
+                    },
+                    "insertionOrder": true
                 }
             },
             "required": [
@@ -99,21 +104,24 @@
             "type": "array",
             "items": {
                 "$ref": "#/definitions/Database"
-            }
+            },
+            "insertionOrder": true
         },
         "SQL": {
             "description": "An array of SQL statements to execute within the database.",
             "type": "array",
             "items": {
                 "type": "string"
-            }
+            },
+            "insertionOrder": true
         },
         "Users": {
             "description": "An array of users within the cluster.",
             "type": "array",
             "items": {
                 "$ref": "#/definitions/User"
-            }
+            },
+            "insertionOrder": true
         }
     },
     "additionalProperties": false,
@@ -137,6 +145,7 @@
     "primaryIdentifier": [
         "/properties/ExecutionId"
     ],
+    "taggable": false,
     "handlers": {
         "create": {
             "permissions": [

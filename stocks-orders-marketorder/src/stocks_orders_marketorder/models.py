@@ -44,9 +44,9 @@ class ResourceModel(BaseModel):
     Quantity: Optional[float]
     Symbol: Optional[str]
     Notes: Optional[str]
-    FilledQuantity: Optional[float]
-    FilledValue: Optional[float]
-    CurrentValue: Optional[float]
+    FilledQuantity: Optional[str]
+    FilledValue: Optional[str]
+    CurrentValue: Optional[str]
     FilledAt: Optional[str]
 
     @classmethod

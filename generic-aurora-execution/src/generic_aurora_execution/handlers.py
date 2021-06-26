@@ -1,6 +1,7 @@
 import logging
 import uuid
 import time
+import json
 from typing import Any, MutableMapping, Optional
 
 from cloudformation_cli_python_lib import (
@@ -71,7 +72,169 @@ def create_handler(
     
     try:
         rdsdataclient = session.client("rds-data")
+        secretsmanagerclient = session.client("secretsmanager")
         ddbclient = session.client('dynamodb')
+
+        for database in model.Databases:
+            rdsdataclient.execute_statement(
+                continueAfterTimeout=True,
+                database='postgres',
+                includeResultMetadata=True,
+                parameters=[
+                    {
+                        'name': 'name',
+                        'value': {
+                            'stringValue': database.Name
+                        }
+                    },
+                ],
+                resourceArn=model.ClusterArn,
+                resultSetOptions={
+                    'decimalReturnType': 'STRING'
+                },
+                secretArn=model.SecretArn,
+                sql='CREATE DATABASE :name;'
+            )
+
+        transactionid = rdsdataclient.begin_transaction(
+            database='postgres',
+            resourceArn=model.ClusterArn,
+            secretArn=model.SecretArn
+        )['transactionId']
+        for user in database.Users:
+            parameters = [
+                {
+                    'name': 'username',
+                    'value': {
+                        'stringValue': user.Name
+                    }
+                },
+            ]
+            sql = """
+            DO
+$do$
+BEGIN
+   IF NOT EXISTS (
+      SELECT FROM pg_catalog.pg_roles
+      WHERE rolname = ':username') THEN
+      CREATE ROLE :username LOGIN{};
+   END IF;
+END
+$do$;
+""".format(" PASSWORD ':password'" if user.SecretId else '')
+            if user.SecretId:
+                secret = json.loads(secretsmanagerclient.get_secret_value(
+                    SecretId=user.SecretId
+                )['SecretString'])
+                parameters.append({
+                    'name': 'password',
+                    'value': {
+                        'stringValue': secret['password']
+                    }
+                })
+
+            rdsdataclient.execute_statement(
+                continueAfterTimeout=True,
+                database='postgres',
+                includeResultMetadata=True,
+                parameters=parameters,
+                resourceArn=model.ClusterArn,
+                resultSetOptions={
+                    'decimalReturnType': 'STRING'
+                },
+                secretArn=model.SecretArn,
+                sql='{};'.format(sql),
+                transactionId=transactionid
+            )
+
+            for grant in user.Grants:
+                rdsdataclient.execute_statement(
+                    continueAfterTimeout=True,
+                    database='postgres',
+                    includeResultMetadata=True,
+                    parameters=[
+                        {
+                            'name': 'database',
+                            'value': {
+                                'stringValue': grant.Database
+                            }
+                        },
+                        {
+                            'name': 'user',
+                            'value': {
+                                'stringValue': user.Name
+                            }
+                        },
+                    ],
+                    resourceArn=model.ClusterArn,
+                    resultSetOptions={
+                        'decimalReturnType': 'STRING'
+                    },
+                    secretArn=model.SecretArn,
+                    sql="GRANT {} ON DATABASE ':database' TO ':user';".format(', '.join(grant.Privileges)),
+                    transactionId=transactionid
+                )
+            if user.SuperUser:
+                rdsdataclient.execute_statement(
+                    continueAfterTimeout=True,
+                    database='postgres',
+                    includeResultMetadata=True,
+                    parameters=[
+                        {
+                            'name': 'user',
+                            'value': {
+                                'stringValue': user.Name
+                            }
+                        },
+                    ],
+                    resourceArn=model.ClusterArn,
+                    resultSetOptions={
+                        'decimalReturnType': 'STRING'
+                    },
+                    secretArn=model.SecretArn,
+                    sql="GRANT rds_superuser TO ':user';",
+                    transactionId=transactionid
+                )
+        for database in model.Databases:
+            for extension in database.Extensions:
+                rdsdataclient.execute_statement(
+                    continueAfterTimeout=True,
+                    database=database.Name,
+                    includeResultMetadata=True,
+                    parameters=[
+                        {
+                            'name': 'extension',
+                            'value': {
+                                'stringValue': extension
+                            }
+                        },
+                    ],
+                    resourceArn=model.ClusterArn,
+                    resultSetOptions={
+                        'decimalReturnType': 'STRING'
+                    },
+                    secretArn=model.SecretArn,
+                    sql='CREATE EXTENSION IF NOT EXISTS :extension;',
+                    transactionId=transactionid
+                )
+            for sql in database.SQL:
+                rdsdataclient.execute_statement(
+                    continueAfterTimeout=True,
+                    database=database.Name,
+                    includeResultMetadata=True,
+                    resourceArn=model.ClusterArn,
+                    resultSetOptions={
+                        'decimalReturnType': 'STRING'
+                    },
+                    secretArn=model.SecretArn,
+                    sql=sql,
+                    transactionId=transactionid
+                )
+        rdsdataclient.commit_transaction(
+            resourceArn=model.ClusterArn,
+            secretArn=model.SecretArn,
+            transactionId=transactionid
+        )
         
         ddbclient.put_item(
             TableName=TRACKING_TABLE_NAME,
@@ -149,6 +312,7 @@ def update_handler(
     except Exception as e:
         if not isinstance(e, exceptions.NotFound):
             raise exceptions.InternalFailure(f"{e}")
+        raise e
 
     model.ClusterArn = None
     model.SecretArn = None
@@ -203,6 +367,7 @@ def delete_handler(
     except Exception as e:
         if not isinstance(e, exceptions.NotFound):
             raise exceptions.InternalFailure(f"{e}")
+        raise e
 
     return ProgressEvent(
         status=OperationStatus.SUCCESS,
@@ -238,6 +403,7 @@ def read_handler(
     except Exception as e:
         if not isinstance(e, exceptions.NotFound):
             raise exceptions.InternalFailure(f"{e}")
+        raise e
 
     return ProgressEvent(
         status=OperationStatus.SUCCESS,
@@ -258,9 +424,13 @@ def list_handler(
     try:
         ddbclient = session.client('dynamodb')
         
-        ddbclient.scan(
+        items = ddbclient.scan(
             TableName=TRACKING_TABLE_NAME
-        )
+        )['Items']
+
+        for item in items:
+            model = ResourceModel(ExecutionId=item['executionId']['S'])
+            models.append(model)
     except Exception as e:
         raise exceptions.InternalFailure(f"{e}")
 

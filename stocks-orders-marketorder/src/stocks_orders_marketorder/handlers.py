@@ -50,9 +50,9 @@ def create_handler(
             })
         order = json.loads(req.text)
         model.Id = order['id']
-        model.FilledQuantity = 0
-        model.FilledValue = 0
-        model.CurrentValue = 0
+        model.FilledQuantity = "0"
+        model.FilledValue = "0"
+        model.CurrentValue = "0"
         model.FilledAt = order['filled_at']
 
     except Exception as e:
@@ -123,7 +123,7 @@ def delete_handler(
                     },
                     json={
                         'symbol': model.Symbol,
-                        'qty': model.FilledQuantity,
+                        'qty': float(model.FilledQuantity),
                         'side': 'sell',
                         'type': 'market',
                         'time_in_force': 'day'
@@ -172,12 +172,12 @@ def read_handler(
             raise exceptions.NotFound(type_name=TYPE_NAME, identifier=model.Id)
         model.Symbol = order['symbol']
         model.Quantity = float(order['qty'])
-        model.FilledQuantity = float(order['filled_qty'])
+        model.FilledQuantity = str(order['filled_qty'])
         if order['filled_avg_price'] == None:
-            model.FilledValue = 0
-            model.CurrentValue = 0
+            model.FilledValue = "0"
+            model.CurrentValue = "0"
         else:
-            model.FilledValue = float(order['filled_qty']) * float(order['filled_avg_price'])
+            model.FilledValue = str(float(order['filled_qty']) * float(order['filled_avg_price']))
             req = requests.get(
                 url='https://data.alpaca.markets/v2/stocks/{}/trades/latest'.format(order['symbol']),
                 headers={
@@ -185,7 +185,7 @@ def read_handler(
                     'APCA-API-SECRET-KEY': config.Credentials.SecretKey
                 })
             trade = json.loads(req.text)
-            model.CurrentValue = float(order['filled_qty']) * float(trade['trade']['p'])
+            model.CurrentValue = str(float(order['filled_qty']) * float(trade['trade']['p']))
         model.FilledAt = order['filled_at']
 
     except Exception as e:
@@ -223,13 +223,13 @@ def list_handler(
                 Quantity=float(order['qty']),
                 Symbol=order['symbol'],
                 Notes=None,
-                FilledQuantity=float(order['filled_qty']),
-                FilledValue=0,
-                CurrentValue=0,
+                FilledQuantity=str(order['filled_qty']),
+                FilledValue="0",
+                CurrentValue="0",
                 FilledAt=order['filled_at'],
             )
             if order['filled_avg_price'] != None:
-                model.FilledValue = float(order['filled_qty']) * float(order['filled_avg_price'])
+                model.FilledValue = str(float(order['filled_qty']) * float(order['filled_avg_price']))
                 req = requests.get(
                     url='https://data.alpaca.markets/v2/stocks/{}/trades/latest'.format(order['symbol']),
                     headers={
@@ -237,7 +237,7 @@ def list_handler(
                         'APCA-API-SECRET-KEY': config.Credentials.SecretKey
                     })
                 trade = json.loads(req.text)
-                model.CurrentValue = float(order['filled_qty']) * float(trade['trade']['p'])
+                model.CurrentValue = str(float(order['filled_qty']) * float(trade['trade']['p']))
             
             models.append(model)
 
