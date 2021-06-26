@@ -101,7 +101,7 @@ def create_handler(
             resourceArn=model.ClusterArn,
             secretArn=model.SecretArn
         )['transactionId']
-        for user in database.Users:
+        for user in model.Users:
             parameters = [
                 {
                     'name': 'username',
@@ -116,7 +116,7 @@ $do$
 BEGIN
    IF NOT EXISTS (
       SELECT FROM pg_catalog.pg_roles
-      WHERE rolname = ':username') THEN
+      WHERE rolname = :username) THEN
       CREATE ROLE :username LOGIN{};
    END IF;
 END
@@ -147,33 +147,34 @@ $do$;
                 transactionId=transactionid
             )
 
-            for grant in user.Grants:
-                rdsdataclient.execute_statement(
-                    continueAfterTimeout=True,
-                    database='postgres',
-                    includeResultMetadata=True,
-                    parameters=[
-                        {
-                            'name': 'database',
-                            'value': {
-                                'stringValue': grant.Database
-                            }
+            if user.Grants:
+                for grant in user.Grants:
+                    rdsdataclient.execute_statement(
+                        continueAfterTimeout=True,
+                        database='postgres',
+                        includeResultMetadata=True,
+                        parameters=[
+                            {
+                                'name': 'database',
+                                'value': {
+                                    'stringValue': grant.Database
+                                }
+                            },
+                            {
+                                'name': 'user',
+                                'value': {
+                                    'stringValue': user.Name
+                                }
+                            },
+                        ],
+                        resourceArn=model.ClusterArn,
+                        resultSetOptions={
+                            'decimalReturnType': 'STRING'
                         },
-                        {
-                            'name': 'user',
-                            'value': {
-                                'stringValue': user.Name
-                            }
-                        },
-                    ],
-                    resourceArn=model.ClusterArn,
-                    resultSetOptions={
-                        'decimalReturnType': 'STRING'
-                    },
-                    secretArn=model.SecretArn,
-                    sql="GRANT {} ON DATABASE ':database' TO ':user';".format(', '.join(grant.Privileges)),
-                    transactionId=transactionid
-                )
+                        secretArn=model.SecretArn,
+                        sql="GRANT {} ON DATABASE :database TO :user;".format(', '.join(grant.Privileges)),
+                        transactionId=transactionid
+                    )
             if user.SuperUser:
                 rdsdataclient.execute_statement(
                     continueAfterTimeout=True,
@@ -192,44 +193,59 @@ $do$;
                         'decimalReturnType': 'STRING'
                     },
                     secretArn=model.SecretArn,
-                    sql="GRANT rds_superuser TO ':user';",
+                    sql="GRANT rds_superuser TO :user;",
                     transactionId=transactionid
                 )
+        for sql in model.SQL:
+            rdsdataclient.execute_statement(
+                continueAfterTimeout=True,
+                database=database.Name,
+                includeResultMetadata=True,
+                resourceArn=model.ClusterArn,
+                resultSetOptions={
+                    'decimalReturnType': 'STRING'
+                },
+                secretArn=model.SecretArn,
+                sql=sql,
+                transactionId=transactionid
+            )
         for database in model.Databases:
-            for extension in database.Extensions:
-                rdsdataclient.execute_statement(
-                    continueAfterTimeout=True,
-                    database=database.Name,
-                    includeResultMetadata=True,
-                    parameters=[
-                        {
-                            'name': 'extension',
-                            'value': {
-                                'stringValue': extension
-                            }
+            if database.Extensions:
+                for extension in database.Extensions:
+                    rdsdataclient.execute_statement(
+                        continueAfterTimeout=True,
+                        database=database.Name,
+                        includeResultMetadata=True,
+                        parameters=[
+                            {
+                                'name': 'extension',
+                                'value': {
+                                    'stringValue': extension
+                                }
+                            },
+                        ],
+                        resourceArn=model.ClusterArn,
+                        resultSetOptions={
+                            'decimalReturnType': 'STRING'
                         },
-                    ],
-                    resourceArn=model.ClusterArn,
-                    resultSetOptions={
-                        'decimalReturnType': 'STRING'
-                    },
-                    secretArn=model.SecretArn,
-                    sql='CREATE EXTENSION IF NOT EXISTS :extension;',
-                    transactionId=transactionid
-                )
-            for sql in database.SQL:
-                rdsdataclient.execute_statement(
-                    continueAfterTimeout=True,
-                    database=database.Name,
-                    includeResultMetadata=True,
-                    resourceArn=model.ClusterArn,
-                    resultSetOptions={
-                        'decimalReturnType': 'STRING'
-                    },
-                    secretArn=model.SecretArn,
-                    sql=sql,
-                    transactionId=transactionid
-                )
+                        secretArn=model.SecretArn,
+                        sql='CREATE EXTENSION IF NOT EXISTS :extension;',
+                        transactionId=transactionid
+                    )
+            if database.SQL:
+                for sql in database.SQL:
+                    rdsdataclient.execute_statement(
+                        continueAfterTimeout=True,
+                        database=database.Name,
+                        includeResultMetadata=True,
+                        resourceArn=model.ClusterArn,
+                        resultSetOptions={
+                            'decimalReturnType': 'STRING'
+                        },
+                        secretArn=model.SecretArn,
+                        sql=sql,
+                        transactionId=transactionid
+                    )
         rdsdataclient.commit_transaction(
             resourceArn=model.ClusterArn,
             secretArn=model.SecretArn,

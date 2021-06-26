@@ -72,7 +72,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### SQL
 
-An array of SQL statements to execute within the database.
+An array of SQL statements to execute within the postgres database.
 
 _Required_: No
 

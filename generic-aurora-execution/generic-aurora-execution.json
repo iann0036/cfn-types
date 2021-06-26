@@ -108,7 +108,7 @@
             "insertionOrder": true
         },
         "SQL": {
-            "description": "An array of SQL statements to execute within the database.",
+            "description": "An array of SQL statements to execute within the postgres database.",
             "type": "array",
             "items": {
                 "type": "string"
