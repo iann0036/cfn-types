@@ -1,0 +1,194 @@
+{
+    "typeName": "Generic::Aurora::Execution",
+    "description": "Uses the Aurora Data API to execute SQL within databases.",
+    "sourceUrl": "https://github.com/iann0036/cfn-types/tree/master/generic-aurora-execution",
+    "definitions": {
+        "Database": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The name of the database.",
+                    "type": "string"
+                },
+                "Extensions": {
+                    "description": "An array of extensions to enable within the database.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "SQL": {
+                    "description": "An array of SQL statements to execute within the database.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "Name"
+            ],
+            "additionalProperties": false
+        },
+        "User": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The username of the user.",
+                    "type": "string"
+                },
+                "SecretId": {
+                    "description": "The Secrets Manager secret ID or ARN of the credentials to set for the user ('password' field of the JSON secret value).",
+                    "type": "string"
+                },
+                "SuperUser": {
+                    "description": "Whether to give the user rds_superuser privileges.",
+                    "type": "boolean"
+                },
+                "Grants": {
+                    "description": "An array of grants to assign to the user.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Grant"
+                    }
+                }
+            },
+            "required": [
+                "Name"
+            ],
+            "additionalProperties": false
+        },
+        "Grant": {
+            "type": "object",
+            "properties": {
+                "Database": {
+                    "description": "The name of the database.",
+                    "type": "string"
+                },
+                "Privileges": {
+                    "description": "An array of privileges to grant (CONNECT, SELECT, etc.).",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "Database",
+                "Privileges"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "ExecutionId": {
+            "description": "A unique identifier to track this execution.",
+            "type": "string"
+        },
+        "ClusterArn": {
+            "description": "The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster.",
+            "type": "string",
+            "pattern": "^arn:.*:rds:.*:.*:cluster:.+$"
+        },
+        "SecretArn": {
+            "description": "The name or ARN of the secret that enables access to the DB cluster.",
+            "type": "string"
+        },
+        "Databases": {
+            "description": "An array of databases within the cluster.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Database"
+            }
+        },
+        "SQL": {
+            "description": "An array of SQL statements to execute within the database.",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "Users": {
+            "description": "An array of users within the cluster.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/User"
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "ClusterArn",
+        "SecretArn"
+    ],
+    "readOnlyProperties": [
+        "/properties/ExecutionId"
+    ],
+    "writeOnlyProperties": [
+        "/properties/ClusterArn",
+        "/properties/SecretArn",
+        "/properties/Databases",
+        "/properties/SQL",
+        "/properties/Users"
+    ],
+    "createOnlyProperties": [
+        "/properties/ClusterArn"
+    ],
+    "primaryIdentifier": [
+        "/properties/ExecutionId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "rds:*",
+                "secretsmanager:GetSecretValue",
+                "rds-data:*",
+                "dynamodb:DescribeTable",
+                "dynamodb:CreateTable",
+                "dynamodb:PutItem"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "rds:*",
+                "secretsmanager:GetSecretValue",
+                "rds-data:*",
+                "dynamodb:DescribeTable",
+                "dynamodb:CreateTable",
+                "dynamodb:GetItem"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "rds:*",
+                "secretsmanager:GetSecretValue",
+                "rds-data:*",
+                "dynamodb:DescribeTable",
+                "dynamodb:CreateTable",
+                "dynamodb:UpdateItem",
+                "dynamodb:GetItem"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "rds:*",
+                "secretsmanager:GetSecretValue",
+                "rds-data:*",
+                "dynamodb:DescribeTable",
+                "dynamodb:CreateTable",
+                "dynamodb:DeleteItem",
+                "dynamodb:GetItem"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "rds:*",
+                "secretsmanager:GetSecretValue",
+                "rds-data:*",
+                "dynamodb:DescribeTable",
+                "dynamodb:CreateTable",
+                "dynamodb:Scan"
+            ]
+        }
+    }
+}

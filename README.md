@@ -4,6 +4,7 @@ Below are some example CloudFormation Resource Type examples.
 
 ### (Post Launch)
 
+- [*Stock Order*](https://github.com/iann0036/cfn-types/blob/master/stocks-orders-marketorder/README.md) - Creates a market order to buy or sell a security at the currently available market price
 - [*Transcribe Custom Vocabulary*](https://github.com/iann0036/cfn-types/blob/master/generic-transcribe-vocabulary/README.md) - Creates a Transcribe Custom Vocabulary
 
 ### (Original Launch)

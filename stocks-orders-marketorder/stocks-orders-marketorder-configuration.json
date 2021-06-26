@@ -1,0 +1,41 @@
+{
+    "properties": {
+        "Credentials": {
+            "$ref": "#/definitions/Credentials"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "Credentials"
+    ],
+    "definitions": {
+        "Credentials": {
+            "type": "object",
+            "properties": {
+                "ApiKey": {
+                    "description": "The alpaca.markets API key ID.",
+                    "type": "string"
+                },
+                "SecretKey": {
+                    "description": "The alpaca.markets secret key.",
+                    "type": "string"
+                },
+                "Environment": {
+                    "description": "The alpaca.markets environment to use. It is recommended to use 'PAPER'.",
+                    "type": "string",
+                    "enum": [
+                        "PAPER",
+                        "LIVE"
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "ApiKey",
+                "SecretKey",
+                "Environment"
+            ]
+        }
+    },
+    "typeName": "Stocks::Orders::MarketOrder"
+}

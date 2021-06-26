@@ -1,0 +1,10 @@
+{
+    "CREATE": {
+        "/Symbol": "AMZN",
+        "/Quantity": 1
+    },
+    "UPDATE": {
+        "/Symbol": "AMZN",
+        "/Quantity": 1
+    }
+}
