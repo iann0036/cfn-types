@@ -14,13 +14,13 @@ from cloudformation_cli_python_lib import (
     identifier_utils,
 )
 
-from .models import ResourceHandlerRequest, ResourceModel
+from .models import ResourceHandlerRequest, ResourceModel, TypeConfigurationModel
 
 # Use this logger to forward log messages to CloudWatch Logs.
 LOG = logging.getLogger(__name__)
 TYPE_NAME = "Stocks::Orders::MarketOrder"
 
-resource = Resource(TYPE_NAME, ResourceModel)
+resource = Resource(TYPE_NAME, ResourceModel, TypeConfigurationModel)
 test_entrypoint = resource.test_entrypoint
 
 
@@ -33,10 +33,6 @@ def create_handler(
     model = request.desiredResourceState
     config = request.typeConfiguration
     model.Notes = None
-
-    print(config)
-    print(config.Credentials)
-    print(config.Credentials.Environment)
 
     try:
         req = requests.post(
