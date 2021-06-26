@@ -1,39 +1,23 @@
 # Stocks::Orders::MarketOrder
 
-Congratulations on starting development! Next steps:
+A market order is a request to buy or sell a security at the currently available market price. The order to buy a security will be submitted on resource creation and the security will be sold (or the unfilled order cancelled) on resource deletion. Supported exchanges are AMEX, ARCA, BATS, NYSE, NASDAQ and NYSEARCA.
 
-1. Write the JSON schema describing your resource, `stocks-orders-marketorder.json`
-2. Implement your resource handlers in `stocks_orders_marketorder/handlers.py`
+## Configuration
 
-> Don't modify `models.py` by hand, any modifications will be overwritten when the `generate` or `package` commands are run.
+The type configuration should look like the following:
 
-Implement CloudFormation resource here. Each function must always return a ProgressEvent.
-
-```python
-ProgressEvent(
-    # Required
-    # Must be one of OperationStatus.IN_PROGRESS, OperationStatus.FAILED, OperationStatus.SUCCESS
-    status=OperationStatus.IN_PROGRESS,
-    # Required on SUCCESS (except for LIST where resourceModels is required)
-    # The current resource model after the operation; instance of ResourceModel class
-    resourceModel=model,
-    resourceModels=None,
-    # Required on FAILED
-    # Customer-facing message, displayed in e.g. CloudFormation stack events
-    message="",
-    # Required on FAILED: a HandlerErrorCode
-    errorCode=HandlerErrorCode.InternalFailure,
-    # Optional
-    # Use to store any state between re-invocation via IN_PROGRESS
-    callbackContext={},
-    # Required on IN_PROGRESS
-    # The number of seconds to delay before re-invocation
-    callbackDelaySeconds=0,
-)
+```
+{
+	"Credentials": {
+		"Environment": "PAPER",
+		"ApiKey": "YOURAPIKEY",
+		"SecretKey": "YOURSECRETKEY"
+	}
+}
 ```
 
-Failures can be passed back to CloudFormation by either raising an exception from `cloudformation_cli_python_lib.exceptions`, or setting the ProgressEvent's `status` to `OperationStatus.FAILED` and `errorCode` to one of `cloudformation_cli_python_lib.HandlerErrorCode`. There is a static helper function, `ProgressEvent.failed`, for this common case.
+where `Environment` is either "PAPER" (recommended) or "LIVE".
 
-## What's with the type hints?
+## Docs
 
-We hope they'll be useful for getting started quicker with an IDE that support type hints. Type hints are optional - if your code doesn't use them, it will still work.
+The docs can be found [here](https://github.com/iann0036/cfn-types/blob/master/stocks-orders-marketorder/docs/README.md).
