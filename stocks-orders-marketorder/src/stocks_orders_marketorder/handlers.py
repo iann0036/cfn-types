@@ -48,7 +48,6 @@ def create_handler(
                 'type': 'market',
                 'time_in_force': 'day'
             })
-        print(req.text)
         order = json.loads(req.text)
         model.Id = order['id']
         model.FilledQuantity = 0
@@ -88,10 +87,6 @@ def delete_handler(
     config = request.typeConfiguration
     model.Notes = None
 
-    print("Desired DELETE")
-    print(model)
-    print(model.Id)
-
     if not model.Id:
         raise exceptions.NotFound(type_name=TYPE_NAME, identifier=model.Id)
     
@@ -102,7 +97,6 @@ def delete_handler(
                 'APCA-API-KEY-ID': config.Credentials.ApiKey,
                 'APCA-API-SECRET-KEY': config.Credentials.SecretKey
             })
-        print(req.text)
         if req.status_code == 404:
             raise exceptions.NotFound(type_name=TYPE_NAME, identifier=model.Id)
         order = json.loads(req.text)
@@ -119,7 +113,6 @@ def delete_handler(
                 'APCA-API-KEY-ID': config.Credentials.ApiKey,
                 'APCA-API-SECRET-KEY': config.Credentials.SecretKey
             })
-        print(req.text)
         if req.status_code < 200 or req.status_code > 299:
             if req.status_code == 422:
                 req = requests.post(
@@ -135,7 +128,6 @@ def delete_handler(
                         'type': 'market',
                         'time_in_force': 'day'
                     })
-                print(req.text)
                 if req.status_code < 200 or req.status_code > 299:
                     raise exceptions.InternalFailure(f"Internal failure")
             else:
@@ -169,7 +161,6 @@ def read_handler(
                 'APCA-API-KEY-ID': config.Credentials.ApiKey,
                 'APCA-API-SECRET-KEY': config.Credentials.SecretKey
             })
-        print(req.text)
         if req.status_code == 404:
             raise exceptions.NotFound(type_name=TYPE_NAME, identifier=model.Id)
         order = json.loads(req.text)
@@ -193,7 +184,6 @@ def read_handler(
                     'APCA-API-KEY-ID': config.Credentials.ApiKey,
                     'APCA-API-SECRET-KEY': config.Credentials.SecretKey
                 })
-            print(req.text)
             trade = json.loads(req.text)
             model.CurrentValue = float(order['filled_qty']) * float(trade['trade']['p'])
         model.FilledAt = order['filled_at']
@@ -246,7 +236,6 @@ def list_handler(
                         'APCA-API-KEY-ID': config.Credentials.ApiKey,
                         'APCA-API-SECRET-KEY': config.Credentials.SecretKey
                     })
-                print(req.text)
                 trade = json.loads(req.text)
                 model.CurrentValue = float(order['filled_qty']) * float(trade['trade']['p'])
             
