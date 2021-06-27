@@ -55,9 +55,10 @@ def ensure_tracking_table_exists(session: Optional[SessionProxy]):
 
 def execute_changes(session, model, sqlhistory):
     try:
-        rdsclient = session.client("rds")
-        rdsdataclient = session.client("rds-data")
-        secretsmanagerclient = session.client("secretsmanager")
+        region = model.ClusterArn.split(":")[3]
+        rdsclient = session.client("rds", region_name=region)
+        rdsdataclient = session.client("rds-data", region_name=region)
+        secretsmanagerclient = session.client("secretsmanager", region_name=region)
 
         clusterinfo = rdsclient.describe_db_clusters(
             DBClusterIdentifier=model.ClusterArn.split(":").pop()
