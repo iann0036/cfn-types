@@ -1,4 +1,4 @@
-# Generic::Aurora::Execution Database
+# Generic::Aurora::Execution Column
 
 ## Syntax
 
@@ -9,9 +9,9 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 {
     "<a href="#name" title="Name">Name</a>" : <i>String</i>,
-    "<a href="#tables" title="Tables">Tables</a>" : <i>[ <a href="table.md">Table</a>, ... ]</i>,
-    "<a href="#extensions" title="Extensions">Extensions</a>" : <i>[ String, ... ]</i>,
-    "<a href="#sql" title="SQL">SQL</a>" : <i>[ String, ... ]</i>
+    "<a href="#type" title="Type">Type</a>" : <i>String</i>,
+    "<a href="#nullable" title="Nullable">Nullable</a>" : <i>Boolean</i>,
+    "<a href="#default" title="Default">Default</a>" : <i>String</i>
 }
 </pre>
 
@@ -19,19 +19,16 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 <a href="#name" title="Name">Name</a>: <i>String</i>
-<a href="#tables" title="Tables">Tables</a>: <i>
-      - <a href="table.md">Table</a></i>
-<a href="#extensions" title="Extensions">Extensions</a>: <i>
-      - String</i>
-<a href="#sql" title="SQL">SQL</a>: <i>
-      - String</i>
+<a href="#type" title="Type">Type</a>: <i>String</i>
+<a href="#nullable" title="Nullable">Nullable</a>: <i>Boolean</i>
+<a href="#default" title="Default">Default</a>: <i>String</i>
 </pre>
 
 ## Properties
 
 #### Name
 
-The name of the database. Creates the database if it doesn't exist.
+The name of the column. Creates the column if it doesn't exist.
 
 _Required_: Yes
 
@@ -41,33 +38,35 @@ _Pattern_: <code>^[a-zA-Z0-9-_]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### Tables
+#### Type
 
-An array of tables to manage within the database.
+The type of the column.
 
-_Required_: No
+_Required_: Yes
 
-_Type_: List of <a href="table.md">Table</a>
+_Type_: String
 
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### Extensions
-
-An array of extensions to enable within the database.
-
-_Required_: No
-
-_Type_: List of String
+_Pattern_: <code>^[a-zA-Z0-9-_]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### SQL
+#### Nullable
 
-An array of SQL statements to execute within the database.
+Whether the column is nullable.
 
 _Required_: No
 
-_Type_: List of String
+_Type_: Boolean
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Default
+
+The default value of the column.
+
+_Required_: No
+
+_Type_: String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

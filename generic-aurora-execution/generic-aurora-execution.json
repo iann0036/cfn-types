@@ -1,20 +1,107 @@
 {
     "typeName": "Generic::Aurora::Execution",
-    "description": "Uses the Aurora Data API to execute SQL within databases.",
+    "description": "Uses the Aurora Data API to execute SQL within databases. Currently only supports Aurora Postgres.",
     "sourceUrl": "https://github.com/iann0036/cfn-types/tree/master/generic-aurora-execution",
     "definitions": {
+        "PrimaryKey": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The name of the primary key. Cannot be updated after creation.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-_]+$"
+                },
+                "Type": {
+                    "description": "The type of the primary key. Cannot be updated after creation.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-_]+$"
+                },
+                "Default": {
+                    "description": "The default value of the primary key. Cannot be updated after creation.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Name",
+                "Type"
+            ],
+            "additionalProperties": false
+        },
+        "Column": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The name of the column. Creates the column if it doesn't exist. Cannot be updated after creation.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-_]+$"
+                },
+                "Type": {
+                    "description": "The type of the column. Cannot be updated after creation.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-_]+$"
+                },
+                "Nullable": {
+                    "description": "Whether the column is nullable. Cannot be updated after creation.",
+                    "type": "boolean"
+                },
+                "Default": {
+                    "description": "The default value of the column. Cannot be updated after creation.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Name",
+                "Type"
+            ],
+            "additionalProperties": false
+        },
+        "Table": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The name of the table. Creates the table if it doesn't exist.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-_]+$"
+                },
+                "Columns": {
+                    "description": "An array of columns to manage within the database.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Column"
+                    },
+                    "insertionOrder": true
+                },
+                "PrimaryKey": {
+                    "$ref": "#/definitions/PrimaryKey"
+                }
+            },
+            "required": [
+                "Name"
+            ],
+            "additionalProperties": false
+        },
         "Database": {
             "type": "object",
             "properties": {
                 "Name": {
-                    "description": "The name of the database.",
-                    "type": "string"
+                    "description": "The name of the database. Creates the database if it doesn't exist.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-_]+$"
+                },
+                "Tables": {
+                    "description": "An array of tables to manage within the database.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Table"
+                    },
+                    "insertionOrder": true
                 },
                 "Extensions": {
                     "description": "An array of extensions to enable within the database.",
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9-_]+$"
                     },
                     "insertionOrder": true
                 },
@@ -36,8 +123,9 @@
             "type": "object",
             "properties": {
                 "Name": {
-                    "description": "The username of the user.",
-                    "type": "string"
+                    "description": "The username of the user. Creates the user/role.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-_]+$"
                 },
                 "SecretId": {
                     "description": "The Secrets Manager secret ID or ARN of the credentials to set for the user ('password' field of the JSON secret value).",
@@ -65,7 +153,11 @@
             "type": "object",
             "properties": {
                 "Database": {
-                    "description": "The name of the database.",
+                    "description": "The name of the database. If the grant Table field is omitted, this represents a database grant, otherwise represents a table grant.",
+                    "type": "string"
+                },
+                "Table": {
+                    "description": "The name of the table. The grant Database field must specify the containing database and the database must be specified in the Databases section of the base of the type.",
                     "type": "string"
                 },
                 "Privileges": {
@@ -75,7 +167,8 @@
                         "type": "string",
                         "pattern": "^[a-zA-Z0-9]+$"
                     },
-                    "insertionOrder": true
+                    "insertionOrder": true,
+                    "minItems": 1
                 }
             },
             "required": [
@@ -100,7 +193,7 @@
             "type": "string"
         },
         "Databases": {
-            "description": "An array of databases within the cluster.",
+            "description": "An array of databases to manage within the cluster.",
             "type": "array",
             "items": {
                 "$ref": "#/definitions/Database"
@@ -122,6 +215,14 @@
                 "$ref": "#/definitions/User"
             },
             "insertionOrder": true
+        },
+        "SQLIdempotency": {
+            "description": "Whether arbitrary SQL statements are executed once (IDEMPOTENT), or on every update (RUN_ONCE).",
+            "type": "string",
+            "enum": [
+                "IDEMPOTENT",
+                "RUN_ONCE"
+            ]
         }
     },
     "additionalProperties": false,
@@ -137,7 +238,8 @@
         "/properties/SecretArn",
         "/properties/Databases",
         "/properties/SQL",
-        "/properties/Users"
+        "/properties/Users",
+        "/properties/SQLIdempotency"
     ],
     "createOnlyProperties": [
         "/properties/ClusterArn"
@@ -149,9 +251,11 @@
     "handlers": {
         "create": {
             "permissions": [
-                "rds:*",
+                "rds:DescribeDBClusters",
                 "secretsmanager:GetSecretValue",
-                "rds-data:*",
+                "rds-data:ExecuteStatement",
+                "rds-data:BeginTransaction",
+                "rds-data:CommitTransaction",
                 "dynamodb:DescribeTable",
                 "dynamodb:CreateTable",
                 "dynamodb:PutItem"
@@ -159,9 +263,6 @@
         },
         "read": {
             "permissions": [
-                "rds:*",
-                "secretsmanager:GetSecretValue",
-                "rds-data:*",
                 "dynamodb:DescribeTable",
                 "dynamodb:CreateTable",
                 "dynamodb:GetItem"
@@ -169,9 +270,11 @@
         },
         "update": {
             "permissions": [
-                "rds:*",
+                "rds:DescribeDBClusters",
                 "secretsmanager:GetSecretValue",
-                "rds-data:*",
+                "rds-data:ExecuteStatement",
+                "rds-data:BeginTransaction",
+                "rds-data:CommitTransaction",
                 "dynamodb:DescribeTable",
                 "dynamodb:CreateTable",
                 "dynamodb:UpdateItem",
@@ -180,9 +283,6 @@
         },
         "delete": {
             "permissions": [
-                "rds:*",
-                "secretsmanager:GetSecretValue",
-                "rds-data:*",
                 "dynamodb:DescribeTable",
                 "dynamodb:CreateTable",
                 "dynamodb:DeleteItem",
@@ -191,9 +291,6 @@
         },
         "list": {
             "permissions": [
-                "rds:*",
-                "secretsmanager:GetSecretValue",
-                "rds-data:*",
                 "dynamodb:DescribeTable",
                 "dynamodb:CreateTable",
                 "dynamodb:Scan"

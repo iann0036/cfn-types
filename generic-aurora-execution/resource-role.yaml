@@ -30,8 +30,10 @@ Resources:
                 - "dynamodb:PutItem"
                 - "dynamodb:Scan"
                 - "dynamodb:UpdateItem"
-                - "rds-data:*"
-                - "rds:*"
+                - "rds-data:BeginTransaction"
+                - "rds-data:CommitTransaction"
+                - "rds-data:ExecuteStatement"
+                - "rds:DescribeDBClusters"
                 - "secretsmanager:GetSecretValue"
                 Resource: "*"
 Outputs:

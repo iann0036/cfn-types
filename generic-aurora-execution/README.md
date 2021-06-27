@@ -1,39 +1,44 @@
 # Generic::Aurora::Execution
 
-Congratulations on starting development! Next steps:
+See the [docs](docs).
 
-1. Write the JSON schema describing your resource, `generic-aurora-execution.json`
-2. Implement your resource handlers in `generic_aurora_execution/handlers.py`
+## Example
 
-> Don't modify `models.py` by hand, any modifications will be overwritten when the `generate` or `package` commands are run.
-
-Implement CloudFormation resource here. Each function must always return a ProgressEvent.
-
-```python
-ProgressEvent(
-    # Required
-    # Must be one of OperationStatus.IN_PROGRESS, OperationStatus.FAILED, OperationStatus.SUCCESS
-    status=OperationStatus.IN_PROGRESS,
-    # Required on SUCCESS (except for LIST where resourceModels is required)
-    # The current resource model after the operation; instance of ResourceModel class
-    resourceModel=model,
-    resourceModels=None,
-    # Required on FAILED
-    # Customer-facing message, displayed in e.g. CloudFormation stack events
-    message="",
-    # Required on FAILED: a HandlerErrorCode
-    errorCode=HandlerErrorCode.InternalFailure,
-    # Optional
-    # Use to store any state between re-invocation via IN_PROGRESS
-    callbackContext={},
-    # Required on IN_PROGRESS
-    # The number of seconds to delay before re-invocation
-    callbackDelaySeconds=0,
-)
 ```
-
-Failures can be passed back to CloudFormation by either raising an exception from `cloudformation_cli_python_lib.exceptions`, or setting the ProgressEvent's `status` to `OperationStatus.FAILED` and `errorCode` to one of `cloudformation_cli_python_lib.HandlerErrorCode`. There is a static helper function, `ProgressEvent.failed`, for this common case.
-
-## What's with the type hints?
-
-We hope they'll be useful for getting started quicker with an IDE that support type hints. Type hints are optional - if your code doesn't use them, it will still work.
+Resources:
+    MyDatabaseSchema:
+        ClusterArn: arn:aws:rds:us-east-1:123456789012:cluster:mycluster
+        SecretArn: arn:aws:secretsmanager:us-east-1:123456789012:secret:myadminsecret-abc123
+        Databases:
+          - Name: mydb
+            Tables:
+              - Name: mytable
+                PrimaryKey:
+                    Name: user_id
+                    Type: uuid
+                    Default: uuid_generate_v4()
+                Columns:
+                  - Name: mycolumn
+                    Type: TEXT
+                    Nullable: true
+                    Default "'mydefaultstringvalue'"
+            Extensions:
+              - uuid-ossp
+            SQL:
+              - SELECT 1;
+        SQL:
+          - SELECT 1;
+        Users:
+          - Name: myuser
+            SecretId: arn:aws:secretsmanager:us-east-1:123456789012:secret:myusersecret-abc123
+            SuperUser: true
+            Grants:
+              - Database: mydb
+                Privileges:
+                  - CONNECT
+              - Database: mydb
+                Table: mytable
+                Privileges:
+                  - SELECT
+        SQLIdempotency: RUN_ONCE
+```

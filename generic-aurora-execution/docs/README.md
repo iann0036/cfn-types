@@ -1,6 +1,6 @@
 # Generic::Aurora::Execution
 
-Uses the Aurora Data API to execute SQL within databases.
+Uses the Aurora Data API to execute SQL within databases. Currently only supports Aurora Postgres.
 
 ## Syntax
 
@@ -16,7 +16,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#secretarn" title="SecretArn">SecretArn</a>" : <i>String</i>,
         "<a href="#databases" title="Databases">Databases</a>" : <i>[ <a href="database.md">Database</a>, ... ]</i>,
         "<a href="#sql" title="SQL">SQL</a>" : <i>[ String, ... ]</i>,
-        "<a href="#users" title="Users">Users</a>" : <i>[ <a href="user.md">User</a>, ... ]</i>
+        "<a href="#users" title="Users">Users</a>" : <i>[ <a href="user.md">User</a>, ... ]</i>,
+        "<a href="#sqlidempotency" title="SQLIdempotency">SQLIdempotency</a>" : <i>String</i>
     }
 }
 </pre>
@@ -34,6 +35,7 @@ Properties:
       - String</i>
     <a href="#users" title="Users">Users</a>: <i>
       - <a href="user.md">User</a></i>
+    <a href="#sqlidempotency" title="SQLIdempotency">SQLIdempotency</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -62,7 +64,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### Databases
 
-An array of databases within the cluster.
+An array of databases to manage within the cluster.
 
 _Required_: No
 
@@ -87,6 +89,18 @@ An array of users within the cluster.
 _Required_: No
 
 _Type_: List of <a href="user.md">User</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### SQLIdempotency
+
+Whether arbitrary SQL statements are executed once (IDEMPOTENT), or on every update (RUN_ONCE).
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>IDEMPOTENT</code> | <code>RUN_ONCE</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

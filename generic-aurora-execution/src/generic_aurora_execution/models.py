@@ -46,6 +46,7 @@ class ResourceModel(BaseModel):
     Databases: Optional[Sequence["_Database"]]
     SQL: Optional[Sequence[str]]
     Users: Optional[Sequence["_User"]]
+    SQLIdempotency: Optional[str]
 
     @classmethod
     def _deserialize(
@@ -63,6 +64,7 @@ class ResourceModel(BaseModel):
             Databases=deserialize_list(json_data.get("Databases"), Database),
             SQL=json_data.get("SQL"),
             Users=deserialize_list(json_data.get("Users"), User),
+            SQLIdempotency=json_data.get("SQLIdempotency"),
         )
 
 
@@ -73,6 +75,7 @@ _ResourceModel = ResourceModel
 @dataclass
 class Database(BaseModel):
     Name: Optional[str]
+    Tables: Optional[Sequence["_Table"]]
     Extensions: Optional[Sequence[str]]
     SQL: Optional[Sequence[str]]
 
@@ -85,6 +88,7 @@ class Database(BaseModel):
             return None
         return cls(
             Name=json_data.get("Name"),
+            Tables=deserialize_list(json_data.get("Tables"), Table),
             Extensions=json_data.get("Extensions"),
             SQL=json_data.get("SQL"),
         )
@@ -92,6 +96,80 @@ class Database(BaseModel):
 
 # work around possible type aliasing issues when variable has same name as a model
 _Database = Database
+
+
+@dataclass
+class Table(BaseModel):
+    Name: Optional[str]
+    Columns: Optional[Sequence["_Column"]]
+    PrimaryKey: Optional["_PrimaryKey"]
+
+    @classmethod
+    def _deserialize(
+        cls: Type["_Table"],
+        json_data: Optional[Mapping[str, Any]],
+    ) -> Optional["_Table"]:
+        if not json_data:
+            return None
+        return cls(
+            Name=json_data.get("Name"),
+            Columns=deserialize_list(json_data.get("Columns"), Column),
+            PrimaryKey=PrimaryKey._deserialize(json_data.get("PrimaryKey")),
+        )
+
+
+# work around possible type aliasing issues when variable has same name as a model
+_Table = Table
+
+
+@dataclass
+class Column(BaseModel):
+    Name: Optional[str]
+    Type: Optional[str]
+    Nullable: Optional[bool]
+    Default: Optional[str]
+
+    @classmethod
+    def _deserialize(
+        cls: Type["_Column"],
+        json_data: Optional[Mapping[str, Any]],
+    ) -> Optional["_Column"]:
+        if not json_data:
+            return None
+        return cls(
+            Name=json_data.get("Name"),
+            Type=json_data.get("Type"),
+            Nullable=json_data.get("Nullable"),
+            Default=json_data.get("Default"),
+        )
+
+
+# work around possible type aliasing issues when variable has same name as a model
+_Column = Column
+
+
+@dataclass
+class PrimaryKey(BaseModel):
+    Name: Optional[str]
+    Type: Optional[str]
+    Default: Optional[str]
+
+    @classmethod
+    def _deserialize(
+        cls: Type["_PrimaryKey"],
+        json_data: Optional[Mapping[str, Any]],
+    ) -> Optional["_PrimaryKey"]:
+        if not json_data:
+            return None
+        return cls(
+            Name=json_data.get("Name"),
+            Type=json_data.get("Type"),
+            Default=json_data.get("Default"),
+        )
+
+
+# work around possible type aliasing issues when variable has same name as a model
+_PrimaryKey = PrimaryKey
 
 
 @dataclass
@@ -123,6 +201,7 @@ _User = User
 @dataclass
 class Grant(BaseModel):
     Database: Optional[str]
+    Table: Optional[str]
     Privileges: Optional[Sequence[str]]
 
     @classmethod
@@ -134,6 +213,7 @@ class Grant(BaseModel):
             return None
         return cls(
             Database=json_data.get("Database"),
+            Table=json_data.get("Table"),
             Privileges=json_data.get("Privileges"),
         )
 

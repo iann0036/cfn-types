@@ -53,6 +53,241 @@ def ensure_tracking_table_exists(session: Optional[SessionProxy]):
         ddbclient.get_waiter('table_exists').wait(TableName=TRACKING_TABLE_NAME)
 
 
+def execute_changes(session, model, sqlhistory):
+    try:
+        rdsclient = session.client("rds")
+        rdsdataclient = session.client("rds-data")
+        secretsmanagerclient = session.client("secretsmanager")
+
+        clusterinfo = rdsclient.describe_db_clusters(
+            DBClusterIdentifier=model.ClusterArn.split(":").pop()
+        )
+        if clusterinfo['DBClusters'][0]['Engine'] != "aurora-postgresql":
+            raise Exception("Invalid engine - only aurora-postgresql is supported")
+
+        if model.Databases:
+            for database in model.Databases:
+                try:
+                    rdsdataclient.execute_statement(
+                        continueAfterTimeout=True,
+                        database='postgres',
+                        includeResultMetadata=True,
+                        resourceArn=model.ClusterArn,
+                        resultSetOptions={
+                            'decimalReturnType': 'STRING'
+                        },
+                        secretArn=model.SecretArn,
+                        sql='CREATE DATABASE {};'.format(database.Name)
+                    )
+                except rdsdataclient.exceptions.BadRequestException:
+                    pass
+
+        transactionid = rdsdataclient.begin_transaction(
+            database='postgres',
+            resourceArn=model.ClusterArn,
+            secretArn=model.SecretArn
+        )['transactionId']
+        if model.Users:
+            for user in model.Users:
+                pwd = ''
+                if user.SecretId:
+                    secret = json.loads(secretsmanagerclient.get_secret_value(
+                        SecretId=user.SecretId
+                    )['SecretString'])
+                    pwd = " PASSWORD '{}'".format(secret['password'].replace("\\", "\\\\").replace("'", "\\'"))
+                sql = """
+DO
+$do$
+BEGIN
+IF NOT EXISTS (
+    SELECT FROM pg_catalog.pg_roles
+    WHERE rolname = '{username}') THEN
+    CREATE ROLE {username} LOGIN{pwd};
+END IF;
+END
+$do$;
+    """.format(username=user.Name, pwd=pwd)
+
+                rdsdataclient.execute_statement(
+                    continueAfterTimeout=True,
+                    database='postgres',
+                    includeResultMetadata=True,
+                    resourceArn=model.ClusterArn,
+                    resultSetOptions={
+                        'decimalReturnType': 'STRING'
+                    },
+                    secretArn=model.SecretArn,
+                    sql='{};'.format(sql),
+                    transactionId=transactionid
+                )
+
+                if user.Grants:
+                    for grant in user.Grants:
+                        if not grant.Table:
+                            rdsdataclient.execute_statement(
+                                continueAfterTimeout=True,
+                                database='postgres',
+                                includeResultMetadata=True,
+                                resourceArn=model.ClusterArn,
+                                resultSetOptions={
+                                    'decimalReturnType': 'STRING'
+                                },
+                                secretArn=model.SecretArn,
+                                sql="GRANT {} ON DATABASE {} TO {};".format(', '.join(grant.Privileges), grant.Database, user.Name),
+                                transactionId=transactionid
+                            )
+                if user.SuperUser:
+                    rdsdataclient.execute_statement(
+                        continueAfterTimeout=True,
+                        database='postgres',
+                        includeResultMetadata=True,
+                        resourceArn=model.ClusterArn,
+                        resultSetOptions={
+                            'decimalReturnType': 'STRING'
+                        },
+                        secretArn=model.SecretArn,
+                        sql="GRANT rds_superuser TO {};".format(user.Name),
+                        transactionId=transactionid
+                    )
+        if model.SQL:
+            for sql in model.SQL:
+                if 'postgres' in sqlhistory and model.SQLIdempotency != "RUN_ONCE":
+                    if sql in sqlhistory['postgres']['SS']:
+                        continue
+
+                rdsdataclient.execute_statement(
+                    continueAfterTimeout=True,
+                    database='postgres',
+                    includeResultMetadata=True,
+                    resourceArn=model.ClusterArn,
+                    resultSetOptions={
+                        'decimalReturnType': 'STRING'
+                    },
+                    secretArn=model.SecretArn,
+                    sql=sql,
+                    transactionId=transactionid
+                )
+        rdsdataclient.commit_transaction(
+            resourceArn=model.ClusterArn,
+            secretArn=model.SecretArn,
+            transactionId=transactionid
+        )
+        if model.Databases:
+            for database in model.Databases:
+                transactionid = rdsdataclient.begin_transaction(
+                    database=database.Name,
+                    resourceArn=model.ClusterArn,
+                    secretArn=model.SecretArn
+                )['transactionId']
+                if database.Extensions:
+                    for extension in database.Extensions:
+                        rdsdataclient.execute_statement(
+                            continueAfterTimeout=True,
+                            database=database.Name,
+                            includeResultMetadata=True,
+                            resourceArn=model.ClusterArn,
+                            resultSetOptions={
+                                'decimalReturnType': 'STRING'
+                            },
+                            secretArn=model.SecretArn,
+                            sql='CREATE EXTENSION IF NOT EXISTS "{}";'.format(extension),
+                            transactionId=transactionid
+                        )
+                if database.Tables:
+                    for table in database.Tables:
+                        primarykey = ''
+                        if table.PrimaryKey:
+                            primarykey = '{} {} PRIMARY KEY{}'.format(table.PrimaryKey.Name, table.PrimaryKey.Type, (' DEFAULT {}'.format(table.PrimaryKey.Default) if table.PrimaryKey.Default else ''))
+                        rdsdataclient.execute_statement(
+                            continueAfterTimeout=True,
+                            database=database.Name,
+                            includeResultMetadata=True,
+                            resourceArn=model.ClusterArn,
+                            resultSetOptions={
+                                'decimalReturnType': 'STRING'
+                            },
+                            secretArn=model.SecretArn,
+                            sql='CREATE TABLE IF NOT EXISTS {tablename}({primarykey});'.format(tablename=table.Name, primarykey=primarykey),
+                            transactionId=transactionid
+                        )
+                        if table.Columns:
+                            for column in table.Columns:
+                                rdsdataclient.execute_statement(
+                                    continueAfterTimeout=True,
+                                    database=database.Name,
+                                    includeResultMetadata=True,
+                                    resourceArn=model.ClusterArn,
+                                    resultSetOptions={
+                                        'decimalReturnType': 'STRING'
+                                    },
+                                    secretArn=model.SecretArn,
+                                    sql='ALTER TABLE {tablename} ADD COLUMN IF NOT EXISTS {columnname} {typ}{nullable}{default};'.format(tablename=table.Name, columnname=column.Name, typ=column.Type, nullable=("" if column.Nullable else " NOT NULL"), default=(" DEFAULT {}".format(column.Default) if column.Default else "")),
+                                    transactionId=transactionid
+                                )
+                if model.Users:
+                    for user in model.Users:
+                        if user.Grants:
+                            for grant in user.Grants:
+                                if grant.Database == database.Name and grant.Table:
+                                    rdsdataclient.execute_statement(
+                                        continueAfterTimeout=True,
+                                        database=grant.Database,
+                                        includeResultMetadata=True,
+                                        resourceArn=model.ClusterArn,
+                                        resultSetOptions={
+                                            'decimalReturnType': 'STRING'
+                                        },
+                                        secretArn=model.SecretArn,
+                                        sql="GRANT {} ON TABLE {} TO {};".format(', '.join(grant.Privileges), grant.Table, user.Name),
+                                        transactionId=transactionid
+                                    )
+                if database.SQL:
+                    for sql in database.SQL:
+                        if database.Name in sqlhistory and model.SQLIdempotency != "RUN_ONCE":
+                            if sql in sqlhistory[database.Name]['SS']:
+                                continue
+                        
+                        rdsdataclient.execute_statement(
+                            continueAfterTimeout=True,
+                            database=database.Name,
+                            includeResultMetadata=True,
+                            resourceArn=model.ClusterArn,
+                            resultSetOptions={
+                                'decimalReturnType': 'STRING'
+                            },
+                            secretArn=model.SecretArn,
+                            sql=sql,
+                            transactionId=transactionid
+                        )
+                rdsdataclient.commit_transaction(
+                    resourceArn=model.ClusterArn,
+                    secretArn=model.SecretArn,
+                    transactionId=transactionid
+                )
+    except Exception as e:
+        raise exceptions.InternalFailure(f"{e}")
+
+
+def generate_sql_history_block(model):
+    ret = {
+        'M': {}
+    }
+
+    if model.SQL:
+        ret['M']['postgres'] = {
+            'SS': list(model.SQL)
+        }
+
+    if model.Databases:
+        for database in model.Databases:
+            if database.SQL:
+                ret['M'][database.Name] = {
+                    'SS': list(database.SQL)
+                }
+
+    return ret
+
+
 @resource.handler(Action.CREATE)
 def create_handler(
     session: Optional[SessionProxy],
@@ -71,187 +306,10 @@ def create_handler(
     model.ExecutionId = executionId
     
     try:
-        rdsdataclient = session.client("rds-data")
-        secretsmanagerclient = session.client("secretsmanager")
+        execute_changes(session, model, {})
+
         ddbclient = session.client('dynamodb')
 
-        for database in model.Databases:
-            rdsdataclient.execute_statement(
-                continueAfterTimeout=True,
-                database='postgres',
-                includeResultMetadata=True,
-                parameters=[
-                    {
-                        'name': 'name',
-                        'value': {
-                            'stringValue': database.Name
-                        }
-                    },
-                ],
-                resourceArn=model.ClusterArn,
-                resultSetOptions={
-                    'decimalReturnType': 'STRING'
-                },
-                secretArn=model.SecretArn,
-                sql='CREATE DATABASE :name;'
-            )
-
-        transactionid = rdsdataclient.begin_transaction(
-            database='postgres',
-            resourceArn=model.ClusterArn,
-            secretArn=model.SecretArn
-        )['transactionId']
-        for user in model.Users:
-            parameters = [
-                {
-                    'name': 'username',
-                    'value': {
-                        'stringValue': user.Name
-                    }
-                },
-            ]
-            sql = """
-            DO
-$do$
-BEGIN
-   IF NOT EXISTS (
-      SELECT FROM pg_catalog.pg_roles
-      WHERE rolname = :username) THEN
-      CREATE ROLE :username LOGIN{};
-   END IF;
-END
-$do$;
-""".format(" PASSWORD ':password'" if user.SecretId else '')
-            if user.SecretId:
-                secret = json.loads(secretsmanagerclient.get_secret_value(
-                    SecretId=user.SecretId
-                )['SecretString'])
-                parameters.append({
-                    'name': 'password',
-                    'value': {
-                        'stringValue': secret['password']
-                    }
-                })
-
-            rdsdataclient.execute_statement(
-                continueAfterTimeout=True,
-                database='postgres',
-                includeResultMetadata=True,
-                parameters=parameters,
-                resourceArn=model.ClusterArn,
-                resultSetOptions={
-                    'decimalReturnType': 'STRING'
-                },
-                secretArn=model.SecretArn,
-                sql='{};'.format(sql),
-                transactionId=transactionid
-            )
-
-            if user.Grants:
-                for grant in user.Grants:
-                    rdsdataclient.execute_statement(
-                        continueAfterTimeout=True,
-                        database='postgres',
-                        includeResultMetadata=True,
-                        parameters=[
-                            {
-                                'name': 'database',
-                                'value': {
-                                    'stringValue': grant.Database
-                                }
-                            },
-                            {
-                                'name': 'user',
-                                'value': {
-                                    'stringValue': user.Name
-                                }
-                            },
-                        ],
-                        resourceArn=model.ClusterArn,
-                        resultSetOptions={
-                            'decimalReturnType': 'STRING'
-                        },
-                        secretArn=model.SecretArn,
-                        sql="GRANT {} ON DATABASE :database TO :user;".format(', '.join(grant.Privileges)),
-                        transactionId=transactionid
-                    )
-            if user.SuperUser:
-                rdsdataclient.execute_statement(
-                    continueAfterTimeout=True,
-                    database='postgres',
-                    includeResultMetadata=True,
-                    parameters=[
-                        {
-                            'name': 'user',
-                            'value': {
-                                'stringValue': user.Name
-                            }
-                        },
-                    ],
-                    resourceArn=model.ClusterArn,
-                    resultSetOptions={
-                        'decimalReturnType': 'STRING'
-                    },
-                    secretArn=model.SecretArn,
-                    sql="GRANT rds_superuser TO :user;",
-                    transactionId=transactionid
-                )
-        for sql in model.SQL:
-            rdsdataclient.execute_statement(
-                continueAfterTimeout=True,
-                database=database.Name,
-                includeResultMetadata=True,
-                resourceArn=model.ClusterArn,
-                resultSetOptions={
-                    'decimalReturnType': 'STRING'
-                },
-                secretArn=model.SecretArn,
-                sql=sql,
-                transactionId=transactionid
-            )
-        for database in model.Databases:
-            if database.Extensions:
-                for extension in database.Extensions:
-                    rdsdataclient.execute_statement(
-                        continueAfterTimeout=True,
-                        database=database.Name,
-                        includeResultMetadata=True,
-                        parameters=[
-                            {
-                                'name': 'extension',
-                                'value': {
-                                    'stringValue': extension
-                                }
-                            },
-                        ],
-                        resourceArn=model.ClusterArn,
-                        resultSetOptions={
-                            'decimalReturnType': 'STRING'
-                        },
-                        secretArn=model.SecretArn,
-                        sql='CREATE EXTENSION IF NOT EXISTS :extension;',
-                        transactionId=transactionid
-                    )
-            if database.SQL:
-                for sql in database.SQL:
-                    rdsdataclient.execute_statement(
-                        continueAfterTimeout=True,
-                        database=database.Name,
-                        includeResultMetadata=True,
-                        resourceArn=model.ClusterArn,
-                        resultSetOptions={
-                            'decimalReturnType': 'STRING'
-                        },
-                        secretArn=model.SecretArn,
-                        sql=sql,
-                        transactionId=transactionid
-                    )
-        rdsdataclient.commit_transaction(
-            resourceArn=model.ClusterArn,
-            secretArn=model.SecretArn,
-            transactionId=transactionid
-        )
-        
         ddbclient.put_item(
             TableName=TRACKING_TABLE_NAME,
             Item={
@@ -260,7 +318,11 @@ $do$;
                 },
                 'lastUpdated': {
                     'N': str(int(time.time()))
-                }
+                },
+                'clusterArn': {
+                    'S': model.ClusterArn
+                },
+                'sqlHistory': generate_sql_history_block(model)
             }
         )
     except Exception as e:
@@ -271,6 +333,7 @@ $do$;
     model.Databases = None
     model.SQL = None
     model.Users = None
+    model.SQLIdempotency = None
 
     return ProgressEvent(
         status=OperationStatus.SUCCESS,
@@ -285,15 +348,14 @@ def update_handler(
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
     model = request.desiredResourceState
-    progress: ProgressEvent = ProgressEvent(
-        status=OperationStatus.IN_PROGRESS,
-        resourceModel=model,
-    )
+
+    print(model)
 
     ensure_tracking_table_exists(session)
+    if not model.ExecutionId:
+        raise exceptions.NotFound(type_name=TYPE_NAME, identifier=model.ExecutionId)
 
     try:
-        rdsdataclient = session.client("rds-data")
         ddbclient = session.client('dynamodb')
 
         item = ddbclient.get_item(
@@ -306,6 +368,10 @@ def update_handler(
         )
         if 'Item' not in item:
             raise exceptions.NotFound(type_name=TYPE_NAME, identifier=model.ExecutionId)
+
+        model.ClusterArn = item['Item']['clusterArn']['S']
+
+        execute_changes(session, model, item['Item']['sqlHistory']['M'])
         
         ddbclient.update_item(
             TableName=TRACKING_TABLE_NAME,
@@ -319,6 +385,10 @@ def update_handler(
                     'Value': {
                         'N': str(int(time.time()))
                     },
+                    'Action': 'PUT'
+                },
+                'sqlHistory': {
+                    'Value': generate_sql_history_block(model),
                     'Action': 'PUT'
                 }
             }
@@ -335,6 +405,7 @@ def update_handler(
     model.Databases = None
     model.SQL = None
     model.Users = None
+    model.SQLIdempotency = None
 
     return ProgressEvent(
         status=OperationStatus.SUCCESS,
@@ -349,12 +420,10 @@ def delete_handler(
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
     model = request.desiredResourceState
-    progress: ProgressEvent = ProgressEvent(
-        status=OperationStatus.IN_PROGRESS,
-        resourceModel=None,
-    )
 
     ensure_tracking_table_exists(session)
+    if not model.ExecutionId:
+        raise exceptions.NotFound(type_name=TYPE_NAME, identifier=model.ExecutionId)
     
     try:
         ddbclient = session.client('dynamodb')
@@ -400,6 +469,8 @@ def read_handler(
     model = request.desiredResourceState
 
     ensure_tracking_table_exists(session)
+    if not model.ExecutionId:
+        raise exceptions.NotFound(type_name=TYPE_NAME, identifier=model.ExecutionId)
     
     try:
         ddbclient = session.client('dynamodb')
@@ -445,7 +516,7 @@ def list_handler(
         )['Items']
 
         for item in items:
-            model = ResourceModel(ExecutionId=item['executionId']['S'])
+            model = ResourceModel(ExecutionId=item['executionId']['S'], ClusterArn=None, SecretArn=None, Databases=None, SQL=None, Users=None, SQLIdempotency=None)
             models.append(model)
     except Exception as e:
         raise exceptions.InternalFailure(f"{e}")
