@@ -1,4 +1,4 @@
-# Generic::Aurora::Schema
+# Generic::Database::Schema
 
 See the [docs](docs).
 
@@ -7,7 +7,7 @@ See the [docs](docs).
 ```
 Resources:
     MyDatabaseSchema:
-        Type: Generic::Aurora::Schema
+        Type: Generic::Database::Schema
         Properties:
             ClusterArn: arn:aws:rds:us-east-1:123456789012:cluster:mycluster
             SecretArn: arn:aws:secretsmanager:us-east-1:123456789012:secret:myadminsecret-abc123
