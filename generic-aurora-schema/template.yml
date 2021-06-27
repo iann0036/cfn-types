@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: AWS SAM template for the Generic::Aurora::Execution resource type
+Description: AWS SAM template for the Generic::Database::Schema resource type
 
 Globals:
   Function:
@@ -11,14 +11,14 @@ Resources:
   TypeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: generic_aurora_execution.handlers.resource
+      Handler: generic_database_schema.handlers.resource
       Runtime: python3.7
       CodeUri: build/
 
   TestEntrypoint:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: generic_aurora_execution.handlers.test_entrypoint
+      Handler: generic_database_schema.handlers.test_entrypoint
       Runtime: python3.7
       CodeUri: build/
 

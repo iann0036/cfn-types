@@ -1,4 +1,4 @@
-# Generic::Aurora::Execution Grant
+# Generic::Database::Schema Grant
 
 ## Syntax
 

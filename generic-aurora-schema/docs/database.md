@@ -1,4 +1,4 @@
-# Generic::Aurora::Execution User
+# Generic::Database::Schema Database
 
 ## Syntax
 
@@ -9,9 +9,9 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 {
     "<a href="#name" title="Name">Name</a>" : <i>String</i>,
-    "<a href="#secretid" title="SecretId">SecretId</a>" : <i>String</i>,
-    "<a href="#superuser" title="SuperUser">SuperUser</a>" : <i>Boolean</i>,
-    "<a href="#grants" title="Grants">Grants</a>" : <i>[ <a href="grant.md">Grant</a>, ... ]</i>
+    "<a href="#tables" title="Tables">Tables</a>" : <i>[ <a href="table.md">Table</a>, ... ]</i>,
+    "<a href="#extensions" title="Extensions">Extensions</a>" : <i>[ String, ... ]</i>,
+    "<a href="#sql" title="SQL">SQL</a>" : <i>[ String, ... ]</i>
 }
 </pre>
 
@@ -19,17 +19,19 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 <a href="#name" title="Name">Name</a>: <i>String</i>
-<a href="#secretid" title="SecretId">SecretId</a>: <i>String</i>
-<a href="#superuser" title="SuperUser">SuperUser</a>: <i>Boolean</i>
-<a href="#grants" title="Grants">Grants</a>: <i>
-      - <a href="grant.md">Grant</a></i>
+<a href="#tables" title="Tables">Tables</a>: <i>
+      - <a href="table.md">Table</a></i>
+<a href="#extensions" title="Extensions">Extensions</a>: <i>
+      - String</i>
+<a href="#sql" title="SQL">SQL</a>: <i>
+      - String</i>
 </pre>
 
 ## Properties
 
 #### Name
 
-The username of the user. Creates the user/role.
+The name of the database. Creates the database if it doesn't exist.
 
 _Required_: Yes
 
@@ -39,33 +41,33 @@ _Pattern_: <code>^[a-zA-Z0-9-_]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### SecretId
+#### Tables
 
-The Secrets Manager secret ID or ARN of the credentials to set for the user ('password' field of the JSON secret value).
+An array of tables to manage within the database.
 
 _Required_: No
 
-_Type_: String
+_Type_: List of <a href="table.md">Table</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### SuperUser
+#### Extensions
 
-Whether to give the user rds_superuser privileges.
+An array of extensions to enable within the database.
 
 _Required_: No
 
-_Type_: Boolean
+_Type_: List of String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### Grants
+#### SQL
 
-An array of grants to assign to the user.
+An array of SQL statements to execute within the database.
 
 _Required_: No
 
-_Type_: List of <a href="grant.md">Grant</a>
+_Type_: List of String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

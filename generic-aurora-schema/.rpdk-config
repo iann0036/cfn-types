@@ -1,10 +1,10 @@
 {
     "artifact_type": "RESOURCE",
-    "typeName": "Generic::Aurora::Execution",
+    "typeName": "Generic::Database::Schema",
     "language": "python37",
     "runtime": "python3.7",
-    "entrypoint": "generic_aurora_execution.handlers.resource",
-    "testEntrypoint": "generic_aurora_execution.handlers.test_entrypoint",
+    "entrypoint": "generic_database_schema.handlers.resource",
+    "testEntrypoint": "generic_database_schema.handlers.test_entrypoint",
     "settings": {
         "version": false,
         "subparser_name": null,

@@ -1,6 +1,6 @@
-# Generic::Aurora::Execution
+# Generic::Database::Schema
 
-Uses the Aurora Data API to execute SQL within databases. Currently only supports Aurora Postgres.
+Uses the Aurora Data API to execute SQL and enforce a schema within a database cluster. Currently only supports Aurora Postgres.
 
 ## Syntax
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "Generic::Aurora::Execution",
+    "Type" : "Generic::Database::Schema",
     "Properties" : {
         "<a href="#clusterarn" title="ClusterArn">ClusterArn</a>" : <i>String</i>,
         "<a href="#secretarn" title="SecretArn">SecretArn</a>" : <i>String</i>,
@@ -25,7 +25,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: Generic::Aurora::Execution
+Type: Generic::Database::Schema
 Properties:
     <a href="#clusterarn" title="ClusterArn">ClusterArn</a>: <i>String</i>
     <a href="#secretarn" title="SecretArn">SecretArn</a>: <i>String</i>

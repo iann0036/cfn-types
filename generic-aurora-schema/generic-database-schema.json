@@ -1,7 +1,7 @@
 {
-    "typeName": "Generic::Aurora::Execution",
-    "description": "Uses the Aurora Data API to execute SQL within databases. Currently only supports Aurora Postgres.",
-    "sourceUrl": "https://github.com/iann0036/cfn-types/tree/master/generic-aurora-execution",
+    "typeName": "Generic::Aurora::Schema",
+    "description": "Uses the Aurora Data API to execute SQL and enforce a schema within a database cluster. Currently only supports Aurora Postgres.",
+    "sourceUrl": "https://github.com/iann0036/cfn-types/tree/master/generic-aurora-schema",
     "definitions": {
         "PrimaryKey": {
             "type": "object",

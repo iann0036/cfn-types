@@ -1,4 +1,4 @@
-# Generic::Aurora::Execution Column
+# Generic::Database::Schema Table
 
 ## Syntax
 
@@ -9,9 +9,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 {
     "<a href="#name" title="Name">Name</a>" : <i>String</i>,
-    "<a href="#type" title="Type">Type</a>" : <i>String</i>,
-    "<a href="#nullable" title="Nullable">Nullable</a>" : <i>Boolean</i>,
-    "<a href="#default" title="Default">Default</a>" : <i>String</i>
+    "<a href="#columns" title="Columns">Columns</a>" : <i>[ <a href="column.md">Column</a>, ... ]</i>,
+    "<a href="#primarykey" title="PrimaryKey">PrimaryKey</a>" : <i><a href="primarykey.md">PrimaryKey</a></i>
 }
 </pre>
 
@@ -19,16 +18,16 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 <a href="#name" title="Name">Name</a>: <i>String</i>
-<a href="#type" title="Type">Type</a>: <i>String</i>
-<a href="#nullable" title="Nullable">Nullable</a>: <i>Boolean</i>
-<a href="#default" title="Default">Default</a>: <i>String</i>
+<a href="#columns" title="Columns">Columns</a>: <i>
+      - <a href="column.md">Column</a></i>
+<a href="#primarykey" title="PrimaryKey">PrimaryKey</a>: <i><a href="primarykey.md">PrimaryKey</a></i>
 </pre>
 
 ## Properties
 
 #### Name
 
-The name of the column. Creates the column if it doesn't exist.
+The name of the table. Creates the table if it doesn't exist.
 
 _Required_: Yes
 
@@ -38,35 +37,21 @@ _Pattern_: <code>^[a-zA-Z0-9-_]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### Type
+#### Columns
 
-The type of the column.
-
-_Required_: Yes
-
-_Type_: String
-
-_Pattern_: <code>^[a-zA-Z0-9-_]+$</code>
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### Nullable
-
-Whether the column is nullable.
+An array of columns to manage within the database.
 
 _Required_: No
 
-_Type_: Boolean
+_Type_: List of <a href="column.md">Column</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### Default
-
-The default value of the column.
+#### PrimaryKey
 
 _Required_: No
 
-_Type_: String
+_Type_: <a href="primarykey.md">PrimaryKey</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

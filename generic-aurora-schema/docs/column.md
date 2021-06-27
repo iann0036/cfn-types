@@ -1,4 +1,4 @@
-# Generic::Aurora::Execution PrimaryKey
+# Generic::Database::Schema Column
 
 ## Syntax
 
@@ -10,6 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "<a href="#name" title="Name">Name</a>" : <i>String</i>,
     "<a href="#type" title="Type">Type</a>" : <i>String</i>,
+    "<a href="#nullable" title="Nullable">Nullable</a>" : <i>Boolean</i>,
     "<a href="#default" title="Default">Default</a>" : <i>String</i>
 }
 </pre>
@@ -19,6 +20,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 <a href="#name" title="Name">Name</a>: <i>String</i>
 <a href="#type" title="Type">Type</a>: <i>String</i>
+<a href="#nullable" title="Nullable">Nullable</a>: <i>Boolean</i>
 <a href="#default" title="Default">Default</a>: <i>String</i>
 </pre>
 
@@ -26,7 +28,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 #### Name
 
-The name of the primary key. Cannot be updated after creation.
+The name of the column. Creates the column if it doesn't exist. Cannot be updated after creation.
 
 _Required_: Yes
 
@@ -38,7 +40,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### Type
 
-The type of the primary key. Cannot be updated after creation.
+The type of the column. Cannot be updated after creation.
 
 _Required_: Yes
 
@@ -48,9 +50,19 @@ _Pattern_: <code>^[a-zA-Z0-9-_]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
+#### Nullable
+
+Whether the column is nullable. Cannot be updated after creation.
+
+_Required_: No
+
+_Type_: Boolean
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
 #### Default
 
-The default value of the primary key. Cannot be updated after creation.
+The default value of the column. Cannot be updated after creation.
 
 _Required_: No
 

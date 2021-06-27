@@ -1,4 +1,4 @@
-# Generic::Aurora::Execution Table
+# Generic::Database::Schema PrimaryKey
 
 ## Syntax
 
@@ -9,8 +9,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 {
     "<a href="#name" title="Name">Name</a>" : <i>String</i>,
-    "<a href="#columns" title="Columns">Columns</a>" : <i>[ <a href="column.md">Column</a>, ... ]</i>,
-    "<a href="#primarykey" title="PrimaryKey">PrimaryKey</a>" : <i><a href="primarykey.md">PrimaryKey</a></i>
+    "<a href="#type" title="Type">Type</a>" : <i>String</i>,
+    "<a href="#default" title="Default">Default</a>" : <i>String</i>
 }
 </pre>
 
@@ -18,16 +18,15 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 <a href="#name" title="Name">Name</a>: <i>String</i>
-<a href="#columns" title="Columns">Columns</a>: <i>
-      - <a href="column.md">Column</a></i>
-<a href="#primarykey" title="PrimaryKey">PrimaryKey</a>: <i><a href="primarykey.md">PrimaryKey</a></i>
+<a href="#type" title="Type">Type</a>: <i>String</i>
+<a href="#default" title="Default">Default</a>: <i>String</i>
 </pre>
 
 ## Properties
 
 #### Name
 
-The name of the table. Creates the table if it doesn't exist.
+The name of the primary key. Cannot be updated after creation.
 
 _Required_: Yes
 
@@ -37,21 +36,25 @@ _Pattern_: <code>^[a-zA-Z0-9-_]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### Columns
+#### Type
 
-An array of columns to manage within the database.
+The type of the primary key. Cannot be updated after creation.
 
-_Required_: No
+_Required_: Yes
 
-_Type_: List of <a href="column.md">Column</a>
+_Type_: String
+
+_Pattern_: <code>^[a-zA-Z0-9-_]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### PrimaryKey
+#### Default
+
+The default value of the primary key. Cannot be updated after creation.
 
 _Required_: No
 
-_Type_: <a href="primarykey.md">PrimaryKey</a>
+_Type_: String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

@@ -19,8 +19,8 @@ from .models import ResourceHandlerRequest, ResourceModel
 
 # Use this logger to forward log messages to CloudWatch Logs.
 LOG = logging.getLogger(__name__)
-TYPE_NAME = "Generic::Aurora::Execution"
-TRACKING_TABLE_NAME = "aurora-execution-tracking-table"
+TYPE_NAME = "Generic::Aurora::Schema"
+TRACKING_TABLE_NAME = "aurora-schema-tracking-table"
 
 resource = Resource(TYPE_NAME, ResourceModel)
 test_entrypoint = resource.test_entrypoint
