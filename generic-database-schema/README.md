@@ -23,7 +23,7 @@ Resources:
                       - Name: mycolumn
                         Type: TEXT
                         Nullable: true
-                        Default "'mydefaultstringvalue'"
+                        Default: "'mydefaultstringvalue'"
                 Extensions:
                   - uuid-ossp
                 SQL:
