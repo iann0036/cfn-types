@@ -1,0 +1,521 @@
+{
+    "typeName": "Generic::DynamoDB::Item",
+    "description": "Manages a single DynamoDB item.",
+    "sourceUrl": "https://github.com/iann0036/cfn-types/tree/master/generic-dynamodb-item",
+    "definitions": {
+        "Attribute": {
+            "description": "The attribute to include.",
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The name of the attribute.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "Value": {
+                    "$ref": "#/definitions/AttributeValue"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "Name",
+                "Value"
+            ]
+        },
+        "AttributeValue": {
+            "description": "The value of the attribute.",
+            "type": "object",
+            "properties": {
+                "S": {
+                    "description": "A string value.",
+                    "type": "string"
+                },
+                "N": {
+                    "description": "A number value.",
+                    "type": "string"
+                },
+                "B": {
+                    "description": "A binary value, encoded as a Base64 string.",
+                    "type": "string"
+                },
+                "SS": {
+                    "description": "A string set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "NS": {
+                    "description": "A number set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "BS": {
+                    "description": "A binary set value, encoded as Base64 strings.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "M": {
+                    "description": "A map value.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Attribute2"
+                    },
+                    "minItems": 1,
+                    "insertionOrder": true
+                },
+                "L": {
+                    "description": "A list value.",
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/Attribute2"
+                        },
+                        "minItems": 1,
+                        "insertionOrder": true
+                    },
+                    "insertionOrder": true
+                },
+                "NULL": {
+                    "description": "A null value.",
+                    "type": "boolean"
+                },
+                "BOOL": {
+                    "description": "A boolean value.",
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "Attribute2": {
+            "description": "The attribute to include.",
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The name of the attribute.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "Value": {
+                    "$ref": "#/definitions/AttributeValue2"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "Name",
+                "Value"
+            ]
+        },
+        "AttributeValue2": {
+            "description": "The value of the attribute.",
+            "type": "object",
+            "properties": {
+                "S": {
+                    "description": "A string value.",
+                    "type": "string"
+                },
+                "N": {
+                    "description": "A number value.",
+                    "type": "string"
+                },
+                "B": {
+                    "description": "A binary value, encoded as a Base64 string.",
+                    "type": "string"
+                },
+                "SS": {
+                    "description": "A string set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "NS": {
+                    "description": "A number set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "BS": {
+                    "description": "A binary set value, encoded as Base64 strings.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "M": {
+                    "description": "A map value.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Attribute3"
+                    },
+                    "minItems": 1,
+                    "insertionOrder": true
+                },
+                "L": {
+                    "description": "A list value.",
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/Attribute3"
+                        },
+                        "minItems": 1,
+                        "insertionOrder": true
+                    },
+                    "insertionOrder": true
+                },
+                "NULL": {
+                    "description": "A null value.",
+                    "type": "boolean"
+                },
+                "BOOL": {
+                    "description": "A boolean value.",
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "Attribute3": {
+            "description": "The attribute to include.",
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The name of the attribute.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "Value": {
+                    "$ref": "#/definitions/AttributeValue3"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "Name",
+                "Value"
+            ]
+        },
+        "AttributeValue3": {
+            "description": "The value of the attribute.",
+            "type": "object",
+            "properties": {
+                "S": {
+                    "description": "A string value.",
+                    "type": "string"
+                },
+                "N": {
+                    "description": "A number value.",
+                    "type": "string"
+                },
+                "B": {
+                    "description": "A binary value, encoded as a Base64 string.",
+                    "type": "string"
+                },
+                "SS": {
+                    "description": "A string set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "NS": {
+                    "description": "A number set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "BS": {
+                    "description": "A binary set value, encoded as Base64 strings.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "M": {
+                    "description": "A map value.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Attribute4"
+                    },
+                    "minItems": 1,
+                    "insertionOrder": true
+                },
+                "L": {
+                    "description": "A list value.",
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/Attribute4"
+                        },
+                        "minItems": 1,
+                        "insertionOrder": true
+                    },
+                    "insertionOrder": true
+                },
+                "NULL": {
+                    "description": "A null value.",
+                    "type": "boolean"
+                },
+                "BOOL": {
+                    "description": "A boolean value.",
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "Attribute4": {
+            "description": "The attribute to include.",
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The name of the attribute.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "Value": {
+                    "$ref": "#/definitions/AttributeValue4"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "Name",
+                "Value"
+            ]
+        },
+        "AttributeValue4": {
+            "description": "The value of the attribute.",
+            "type": "object",
+            "properties": {
+                "S": {
+                    "description": "A string value.",
+                    "type": "string"
+                },
+                "N": {
+                    "description": "A number value.",
+                    "type": "string"
+                },
+                "B": {
+                    "description": "A binary value, encoded as a Base64 string.",
+                    "type": "string"
+                },
+                "SS": {
+                    "description": "A string set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "NS": {
+                    "description": "A number set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "BS": {
+                    "description": "A binary set value, encoded as Base64 strings.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "M": {
+                    "description": "A map value.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Attribute5"
+                    },
+                    "minItems": 1,
+                    "insertionOrder": true
+                },
+                "L": {
+                    "description": "A list value.",
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/Attribute5"
+                        },
+                        "minItems": 1,
+                        "insertionOrder": true
+                    },
+                    "insertionOrder": true
+                },
+                "NULL": {
+                    "description": "A null value.",
+                    "type": "boolean"
+                },
+                "BOOL": {
+                    "description": "A boolean value.",
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "Attribute5": {
+            "description": "The attribute to include.",
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "description": "The name of the attribute.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "Value": {
+                    "$ref": "#/definitions/AttributeValue5"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "Name",
+                "Value"
+            ]
+        },
+        "AttributeValue5": {
+            "description": "The value of the attribute.",
+            "type": "object",
+            "properties": {
+                "S": {
+                    "description": "A string value.",
+                    "type": "string"
+                },
+                "N": {
+                    "description": "A number value.",
+                    "type": "string"
+                },
+                "B": {
+                    "description": "A binary value, encoded as a Base64 string.",
+                    "type": "string"
+                },
+                "SS": {
+                    "description": "A string set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "NS": {
+                    "description": "A number set value.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "BS": {
+                    "description": "A binary set value, encoded as Base64 strings.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "insertionOrder": true
+                },
+                "NULL": {
+                    "description": "A null value.",
+                    "type": "boolean"
+                },
+                "BOOL": {
+                    "description": "A boolean value.",
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "TableName": {
+            "description": "The name of the DynamoDB table to write the item into.",
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 255,
+            "pattern": "^[a-zA-Z0-9-_\\.]+$"
+        },
+        "Attributes": {
+            "description": "An array of attributes for the item. This must include the key attribute(s).",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Attribute"
+            },
+            "minItems": 1,
+            "insertionOrder": true
+        },
+        "PartitionValue": {
+            "type": "string"
+        },
+        "SortValue": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "taggable": false,
+    "required": [
+        "TableName",
+        "Attributes"
+    ],
+    "createOnlyProperties": [
+        "/properties/TableName"
+    ],
+    "readOnlyProperties": [
+        "/properties/PartitionValue",
+        "/properties/SortValue"
+    ],
+    "primaryIdentifier": [
+        "/properties/TableName",
+        "/properties/PartitionValue",
+        "/properties/SortValue"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "dynamodb:DescribeTable",
+                "dynamodb:PutItem"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "dynamodb:DescribeTable",
+                "dynamodb:GetItem"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "dynamodb:DescribeTable",
+                "dynamodb:DeleteItem",
+                "dynamodb:PutItem"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "dynamodb:DescribeTable",
+                "dynamodb:DeleteItem"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "dynamodb:ListTables",
+                "dynamodb:DescribeTable",
+                "dynamodb:Scan"
+            ]
+        }
+    }
+}

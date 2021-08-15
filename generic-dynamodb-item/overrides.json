@@ -1,0 +1,48 @@
+{
+    "CREATE": {
+        "/TableName": "ddb-sample",
+        "/Attributes": [
+            {
+                "Name": "pk",
+                "Value": {
+                    "S": "mypk"
+                }
+            },
+            {
+                "Name": "sk",
+                "Value": {
+                    "S": "mysk"
+                }
+            },
+            {
+                "Name": "other1",
+                "Value": {
+                    "S": "val1"
+                }
+            }
+        ]
+    },
+    "UPDATE": {
+        "/TableName": "ddb-sample",
+        "/Attributes": [
+            {
+                "Name": "pk",
+                "Value": {
+                    "S": "mypk"
+                }
+            },
+            {
+                "Name": "sk",
+                "Value": {
+                    "S": "mysk"
+                }
+            },
+            {
+                "Name": "other2",
+                "Value": {
+                    "S": "val2"
+                }
+            }
+        ]
+    }
+}
