@@ -199,7 +199,7 @@ def update_handler(
         client.put_item(
             TableName=model.TableName,
             Item=item,
-            ConditionExpression="attribute_not_exists(#pk)",
+            ConditionExpression="attribute_exists(#pk)",
             ExpressionAttributeNames={
                 "#pk": partition_key
             }
