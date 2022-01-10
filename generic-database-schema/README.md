@@ -1,6 +1,6 @@
 # Generic::Database::Schema
 
-Manages the schema within an Aurora Postgres database.
+Manages the schema within an Aurora Serverless v1 Postgres database.
 
 All properties with the exception of the `SQL` arrays are handled in an idempotent manner. Idempotent execution of the `SQL` statements can be controlled with the `SQLIdempotency` field. Deletion of the resource leaves all configuration in place and will not destroy any databases, tables etc.
 
